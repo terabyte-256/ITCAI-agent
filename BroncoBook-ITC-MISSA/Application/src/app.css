@@ -1,0 +1,91 @@
+:root {
+	color-scheme: dark;
+	--bg: #0b1020;
+	--bg-alt: #101a36;
+	--panel: #182244;
+	--panel-soft: #121b36;
+	--text: #f5f8ff;
+	--muted: #a6b2d8;
+	--accent: #6fc2ff;
+	--border: rgba(255, 255, 255, 0.12);
+	--danger: #ff7f90;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	min-height: 100%;
+	font-family:
+		Inter,
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		'Segoe UI',
+		sans-serif;
+	background: radial-gradient(circle at top, #152652, var(--bg));
+	color: var(--text);
+}
+
+a {
+	color: var(--accent);
+}
+
+.shell {
+	max-width: 1100px;
+	margin: 0 auto;
+	padding: 1.5rem;
+}
+
+.panel {
+	background: color-mix(in srgb, var(--panel) 88%, transparent);
+	border: 1px solid var(--border);
+	border-radius: 1rem;
+	padding: 1rem;
+}
+
+.button {
+	border: 1px solid var(--border);
+	background: var(--panel);
+	color: var(--text);
+	border-radius: 0.75rem;
+	padding: 0.55rem 0.85rem;
+	font: inherit;
+	cursor: pointer;
+}
+
+.button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.button.is-primary {
+	background: #2c75ff;
+	border-color: transparent;
+}
+
+.chip-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.input,
+.select {
+	width: 100%;
+	background: var(--panel-soft);
+	color: var(--text);
+	border: 1px solid var(--border);
+	border-radius: 0.75rem;
+	padding: 0.6rem 0.75rem;
+	font: inherit;
+}
+
+.muted {
+	color: var(--muted);
+}
+

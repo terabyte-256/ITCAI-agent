@@ -15,16 +15,32 @@
         </div>
 
         <section class="panel">
-          <!-- <h2>Starter questions</h2>
-          <div id="starterQuestions" class="chips"></div> -->
+          <h2>Starter questions</h2>
+          <div id="starterQuestions" class="chips"></div>
         </section>
 
         <section class="panel">
-          <!-- <h2>Analytics</h2>
+          <h2>Provider</h2>
+          <div class="metric"><span>Backend</span><strong id="healthStatus">Checking...</strong></div>
+          <div class="provider-row">
+            <label for="providerSelect">Provider</label>
+            <select id="providerSelect">
+              <option value="openai">OpenAI</option>
+              <option value="ollama">Ollama</option>
+            </select>
+          </div>
+          <div class="provider-row">
+            <label for="modelInput">Model (optional)</label>
+            <input id="modelInput" type="text" placeholder="Use provider default" />
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Analytics</h2>
           <div class="metric"><span>Total queries</span><strong id="metricQueries">0</strong></div>
           <div class="metric"><span>Unanswered</span><strong id="metricUnanswered">0</strong></div>
           <div class="metric"><span>Tool calls</span><strong id="metricTools">0</strong></div>
-          <div class="metric"><span>Avg. sources</span><strong id="metricSources">0</strong></div> -->
+          <div class="metric"><span>Avg. sources</span><strong id="metricSources">0</strong></div>
         </section>
       </aside>
 

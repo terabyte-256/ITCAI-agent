@@ -133,6 +133,27 @@ button {
   color: var(--text);
 }
 
+.provider-row {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.provider-row label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.provider-row select,
+.provider-row input {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-alt);
+  color: var(--text);
+  padding: 8px 10px;
+  font: inherit;
+}
+
 .chat-form {
   display: grid;
   grid-template-columns: 1fr auto;
