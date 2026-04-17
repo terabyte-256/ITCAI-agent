@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Campus Knowledge Agent</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div>
+          <h1>Campus Knowledge Agent</h1>
+          <p class="muted">Ask questions about admissions, deadlines, campus services, and more.</p>
+        </div>
+
+        <section class="panel">
+          <h2>Starter questions</h2>
+          <div id="starterQuestions" class="chips"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Analytics</h2>
+          <div class="metric"><span>Total queries</span><strong id="metricQueries">0</strong></div>
+          <div class="metric"><span>Unanswered</span><strong id="metricUnanswered">0</strong></div>
+          <div class="metric"><span>Tool calls</span><strong id="metricTools">0</strong></div>
+          <div class="metric"><span>Avg. sources</span><strong id="metricSources">0</strong></div>
+        </section>
+      </aside>
+
+      <main class="main">
+        <div id="messages" class="messages"></div>
+        <form id="chatForm" class="chat-form">
+          <textarea id="messageInput" rows="3" placeholder="Ask a question about the university website..."></textarea>
+          <button type="submit">Send</button>
+        </form>
+      </main>
+    </div>
+
+    <template id="messageTemplate">
+      <article class="message-card">
+        <div class="message-role"></div>
+        <div class="message-body"></div>
+        <div class="sources"></div>
+      </article>
+    </template>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
