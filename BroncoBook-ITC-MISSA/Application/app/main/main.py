@@ -51,7 +51,7 @@ def health() -> dict:
 
 @app.get("/", include_in_schema=False)
 def root() -> FileResponse:
-    return FileResponse(static_dir / "index.html")
+    return FileResponse(static_dir / "Home_Page.html")
 
 
 @app.post("/chat/ollama")

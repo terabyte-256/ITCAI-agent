@@ -37,8 +37,6 @@ class RetrievalDebugInfo(BaseModel):
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1)
     conversation_id: Optional[str] = None
-    provider: str = "openai"
-    model: Optional[str] = None
     debug: bool = False
 
 
