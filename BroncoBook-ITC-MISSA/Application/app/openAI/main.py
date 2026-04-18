@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama").lower()
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:8050")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.3")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
@@ -52,7 +52,7 @@ def health() -> dict:
 
 @app.get("/", include_in_schema=False)
 def root() -> FileResponse:
-    return FileResponse(static_dir / "index.html")
+    return FileResponse(static_dir / "Home_Page.html")
 
 @app.post("/chat")
 async def chat(request: ChatRequest) -> dict:

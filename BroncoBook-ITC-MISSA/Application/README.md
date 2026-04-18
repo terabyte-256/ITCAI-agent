@@ -4,12 +4,12 @@ Python FastAPI backend with the **original static frontend** in `app/static/` an
 
 ## Main app path
 
-- Primary UI: `app/static/index.html`, `app/static/app.js`, `app/static/styles.css`
+- Primary UI: `app/static/Home_Page.html`, `app/static/app.js`, `app/static/BroncoBook.css`
 - Served by FastAPI root route: `http://127.0.0.1:8000/`
 
 The static UI was kept mostly unchanged and only patched where needed for:
 - `/api/chat` submission shape
-- provider/model controls
+- environment-managed provider/model display (read-only in UI)
 - source card rendering
 - loading and error handling
 
@@ -29,7 +29,7 @@ The static UI was kept mostly unchanged and only patched where needed for:
 - `index.json` URL mapping is used for source attribution.
 - No DOCX/spec documents are indexed or used at runtime.
 - If retrieval evidence is insufficient, response is:
-  `I could not find that information in the indexed corpus.`
+  `I could not find a reliable answer in the available sources.`
 
 ## SQLite data model
 
@@ -66,6 +66,11 @@ pip install -r requirements.txt
 ```bash
 cp .env.example .env
 ```
+
+Set model/provider defaults in `.env`:
+- `LLM_PROVIDER` (`openai` or `ollama`)
+- `OPENAI_MODEL`
+- `OLLAMA_MODEL` (recommended: `llama3.3`)
 
 ### 4) Start backend
 ```bash

@@ -23,6 +23,12 @@ CORPUS_DIR = os.getenv("CORPUS_DIR", str(BASE_DIR / "data" / "corpus"))
 TOP_K_CHUNKS = int(os.getenv("TOP_K_CHUNKS", "8"))
 SESSION_TTL_MINUTES = int(os.getenv("SESSION_TTL_MINUTES", "90"))
 DATABASE_URL = os.getenv("DATABASE_URL", str(BASE_DIR / "data" / "campus_agent.db"))
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.3")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai").strip().lower()
+if LLM_PROVIDER not in {"openai", "ollama"}:
+    LLM_PROVIDER = "openai"
 
 store = SQLiteStore(DATABASE_URL)
 retriever = CorpusRetriever(CORPUS_DIR, top_k_default=TOP_K_CHUNKS, store=store)
@@ -42,16 +48,31 @@ static_dir = BASE_DIR / "app" / "static"
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
+def resolve_active_provider() -> str:
+    if LLM_PROVIDER == "openai" and not OPENAI_API_KEY:
+        return "ollama"
+    return LLM_PROVIDER
+
+
+def resolve_active_model(provider: str) -> str:
+    return OPENAI_MODEL if provider == "openai" else OLLAMA_MODEL
+
+
 @app.get("/", include_in_schema=False)
 def root() -> FileResponse:
-    return FileResponse(static_dir / "index.html")
+    return FileResponse(static_dir / "Home_Page.html")
 
 
 @app.get("/health")
 def health() -> dict:
+    active_provider = resolve_active_provider()
+    active_model = resolve_active_model(active_provider)
     return {
         "ok": True,
-        "provider_default": "openai" if os.getenv("OPENAI_API_KEY") else "ollama",
+        "provider_default": active_provider,
+        "model_default": active_model,
+        "active_provider": active_provider,
+        "active_model": active_model,
         "database_url": DATABASE_URL,
         **retriever.corpus_stats(),
     }
@@ -166,11 +187,13 @@ def conversation(conversation_id: str) -> dict:
 def chat(request: ChatRequest, debug: Optional[bool] = Query(default=None)) -> ChatResponse:
     try:
         debug_enabled = request.debug if debug is None else debug
+        active_provider = resolve_active_provider()
+        active_model = resolve_active_model(active_provider)
         response = agent.chat(
             request.message,
             request.conversation_id,
-            provider=request.provider,
-            model=request.model,
+            provider=active_provider,
+            model=active_model,
             debug=debug_enabled,
         )
     except Exception as exc:  # pragma: no cover - defensive API boundary
@@ -180,8 +203,11 @@ def chat(request: ChatRequest, debug: Optional[bool] = Query(default=None)) -> C
     answered = not any(
         phrase in answer_lower
         for phrase in [
+            "i could not find that information in the indexed corpus",
+            "i could not find a reliable answer",
             "i could not find",
             "i couldn't find",
+            "i couldn't find a clear list",
             "not in the corpus",
             "cannot be found",
             "don't have enough information",
