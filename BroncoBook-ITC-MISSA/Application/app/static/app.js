@@ -15,6 +15,36 @@ const starterQuestionsEl = document.getElementById('starterQuestions');
 const messageTemplate = document.getElementById('messageTemplate');
 const healthStatus = document.getElementById('healthStatus');
 const activeModelEl = document.getElementById('activeModel');
+const INPUT_MIN_HEIGHT = 45;
+
+function collapseMessageInput() {
+  if (!messageInput) return;
+  messageInput.style.setProperty('height', `${INPUT_MIN_HEIGHT}px`);
+  messageInput.style.setProperty('min-height', `${INPUT_MIN_HEIGHT}px`);
+  messageInput.style.setProperty('overflow-y', 'hidden');
+  messageInput.scrollTop = 0;
+  void messageInput.offsetHeight;
+}
+
+function resizeMessageInput() {
+  if (!messageInput) return;
+  if (!messageInput.value) {
+    collapseMessageInput();
+    return;
+  }
+  messageInput.style.height = '0px';
+  const nextHeight = Math.max(INPUT_MIN_HEIGHT, messageInput.scrollHeight);
+  messageInput.style.height = `${nextHeight}px`;
+  messageInput.style.overflowY = 'hidden';
+}
+
+function resetMessageInput() {
+  if (!messageInput) return;
+  messageInput.value = '';
+  collapseMessageInput();
+  messageInput.dispatchEvent(new Event('input', { bubbles: true }));
+  collapseMessageInput();
+}
 
 function escapeHtml(str) {
   return String(str ?? '')
@@ -347,9 +377,12 @@ async function submitMessage(messageText) {
   if (!message) return;
 
   addMessage('You', message, [], { smoothScroll: true });
-  messageInput.value = '';
+  resetMessageInput();
   const thinkingCard = addMessage('Assistant', 'Thinking...', [], { markdown: true, smoothScroll: true });
   setLoading(true);
+  requestAnimationFrame(() => {
+    resetMessageInput();
+  });
 
   try {
     const response = await fetch('/api/chat', {
@@ -382,6 +415,7 @@ async function submitMessage(messageText) {
     }
   } finally {
     setLoading(false);
+    resetMessageInput();
   }
 }
 
@@ -395,6 +429,7 @@ function renderStarterQuestions(questions) {
     chip.textContent = question;
     chip.addEventListener('click', () => {
       messageInput.value = question;
+      resizeMessageInput();
       void submitMessage(question);
     });
     starterQuestionsEl.appendChild(chip);
@@ -431,6 +466,10 @@ async function loadHealth() {
 }
 
 if (chatForm && messageInput) {
+  messageInput.addEventListener('input', () => {
+    resizeMessageInput();
+  });
+
   messageInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -442,6 +481,8 @@ if (chatForm && messageInput) {
     event.preventDefault();
     await submitMessage(messageInput.value);
   });
+
+  resizeMessageInput();
 }
 
 void loadStarters();
