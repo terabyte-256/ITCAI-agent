@@ -55,6 +55,10 @@ FACTOID_TRIGGERS: Dict[str, tuple[str, ...]] = {
 MIN_SENTENCE_CHARS = 24
 MIN_SENTENCE_WORDS = 4
 
+# Ordinals like "1st", "2nd" are paraphrasable (e.g., "1st year" ↔ "freshman")
+# and must not be required to appear verbatim in retrieved context.
+_ORDINAL_RE = re.compile(r"^\d{1,2}(?:st|nd|rd|th)$", re.IGNORECASE)
+
 QUERY_STOPWORDS = {
     "a",
     "an",
@@ -164,6 +168,17 @@ class AgentService:
         self.ollama_host = os.getenv("OLLAMA_HOST", os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")).rstrip("/")
         self.ollama_model = os.getenv("OLLAMA_MODEL", "llama3.3")
 
+    @staticmethod
+    def _normalize_cpp_aliases(text: str) -> str:
+        normalized = (text or "").lower()
+        normalized = re.sub(r"\bcal\s+poly\s+pomona\b", "cpp", normalized)
+        normalized = re.sub(
+            r"\bcalifornia\s+state\s+polytechnic\s+university,?\s+pomona\b",
+            "cpp",
+            normalized,
+        )
+        return normalized
+
     def _is_retrieval_confident(self, results: List[SearchResult]) -> bool:
         if not results:
             return False
@@ -171,9 +186,10 @@ class AgentService:
         return float(top) >= self.min_retrieval_score
 
     def _extract_query_terms(self, query: str) -> List[str]:
+        normalized_query = self._normalize_cpp_aliases(query)
         return [
             token
-            for token in re.findall(r"[a-z0-9]+", query.lower())
+            for token in re.findall(r"[a-z0-9]+", normalized_query)
             if len(token) > 2 and token not in QUERY_STOPWORDS
         ]
 
@@ -181,10 +197,11 @@ class AgentService:
         terms = self._extract_query_terms(query)
         if not terms:
             return 0.0
-        haystack = f"{result.title}\n{result.section or ''}\n{result.source_url}\n{result.markdown_file}\n{result.content}".lower()
+        haystack_raw = f"{result.title}\n{result.section or ''}\n{result.source_url}\n{result.markdown_file}\n{result.content}".lower()
+        haystack = self._normalize_cpp_aliases(haystack_raw)
         matched = sum(1 for term in terms if term in haystack)
         coverage = matched / len(terms)
-        query_phrase = query.strip().lower()
+        query_phrase = self._normalize_cpp_aliases(query.strip())
         phrase_bonus = 0.35 if query_phrase and query_phrase in haystack else 0.0
         score = coverage + phrase_bonus
 
@@ -224,7 +241,9 @@ class AgentService:
         terms = self._extract_query_terms(query)
         if not terms or not results:
             return False
-        combined = " ".join(f"{item.title} {item.section or ''} {item.content}" for item in results[:4]).lower()
+        combined = self._normalize_cpp_aliases(
+            " ".join(f"{item.title} {item.section or ''} {item.content}" for item in results[:4]).lower()
+        )
         matched = sum(1 for term in terms if term in combined)
         if len(terms) <= 2:
             has_coverage = matched >= 1
@@ -402,6 +421,7 @@ class AgentService:
         unsupported_numbers = [
             token for token in numeric_claims
             if (len(token) > 1 or token.startswith("$"))
+            and not _ORDINAL_RE.match(token)
             and token.lower() not in context_text
         ]
         if unsupported_numbers:
@@ -999,6 +1019,9 @@ class AgentService:
     def _rewrite_query_for_retrieval(self, user_message: str) -> str:
         query = user_message.strip()
         lowered = query.lower()
+        if re.search(r"\bcpp\b", lowered) and "cal poly pomona" not in lowered:
+            query = f"{query} Cal Poly Pomona"
+            lowered = query.lower()
         if self._is_freshman_admissions_intent(lowered):
             return f"{query} office of admissions freshmen students requirements checklist"
         if self._is_financial_aid_intent(lowered):
@@ -1346,6 +1369,7 @@ class AgentService:
         input_items = self._build_openai_input(conversation_id, user_message)
         tool_trace: List[Dict[str, Any]] = []
         last_results: List[SearchResult] = []
+        accumulated_results: List[SearchResult] = []
         usage_input = None
         usage_output = None
         used_tool_calls = False
@@ -1403,7 +1427,8 @@ class AgentService:
                     sources = []
                 if not sources:
                     answer_text = fallback_message
-                if not self._is_answer_supported_by_results(user_message, answer_text, last_results):
+                validation_results = accumulated_results or last_results
+                if not self._is_answer_supported_by_results(user_message, answer_text, validation_results):
                     answer_text = fallback_message
                     sources = []
 
@@ -1462,8 +1487,13 @@ class AgentService:
                         last_results = []
                     if last_results and not self._has_query_coverage(user_message, last_results):
                         last_results = []
-                elif call.name == "get_chunk_context":
-                    last_results = [SearchResult(**item) for item in tool_output.get("chunks", [])]
+                    # Accumulate validated results so the final support check covers
+                    # all evidence the model was given, not just the last search.
+                    seen_accumulated = {r.chunk_id for r in accumulated_results}
+                    for r in last_results:
+                        if r.chunk_id not in seen_accumulated:
+                            accumulated_results.append(r)
+                            seen_accumulated.add(r.chunk_id)
                 input_items.append(
                     {
                         "type": "function_call_output",
@@ -1780,10 +1810,12 @@ class AgentService:
             response_payload = {}
             tooling_mode = "forced_retrieval_fallback"
 
+        used_synthesized_fa = False
         if is_fa_intent:
             synthesized_fa = self._synthesize_financial_aid_answer(selected_results or search_results)
             if synthesized_fa:
                 answer = synthesized_fa
+                used_synthesized_fa = True
             else:
                 answer = (
                     response_payload.get("message", {}).get("content", "").strip()
@@ -1801,11 +1833,10 @@ class AgentService:
         if not sources:
             answer = fallback_message
         if not self._is_answer_supported_by_results(user_message, answer, selected_results):
-            # Allow the synthesized FA answer to pass the support check even
-            # when its structured section headings don't share enough tokens
-            # with a single chunk -- the synthesizer already constrains content
-            # to retrieved sentences.
-            if not (is_fa_intent and answer and answer != fallback_message and answer.startswith("## ")):
+            # Allow the synthesized FA answer to pass the support check: the
+            # synthesizer already constrains content to retrieved sentences, so
+            # token-ratio checks against a single chunk are too strict.
+            if not (is_fa_intent and used_synthesized_fa):
                 answer = fallback_message
                 sources = []
 

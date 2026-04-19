@@ -3,42 +3,99 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BroncoBook Campus Knowledge Agent</title>
+    <title>Cal Poly Pomona Campus Knowledge Assistant</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Graduate&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/static/BroncoBook.css" />
   </head>
   <body>
     <div class="container">
+      <!-- Header -->
       <header>
         <div class="header-content">
-          <div class="header-title-group">
-            <h1 class="header-title">BroncoBook Campus Knowledge Agent</h1>
-            <p class="header-subtitle">Ask about admissions, deadlines, housing, and campus services.</p>
-          </div>
-          <div class="status-badge">
-            <span id="healthStatus">Checking...</span>
-            <strong id="activeModel">Loading model...</strong>
-          </div>
+          <!-- Logo -->
+          <svg
+            class="logo"
+            viewBox="0 0 175 274"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g clip-path="url(#clip0_cpp)">
+              <path
+                d="M0 227.504L0.0028 99.9647L35.8795 79.0479L27.4674 64.3074L101.127 21.3451L117.848 31.1116L158.941 7.2618L158.94 55.097L174.694 64.33L158.94 91.1392V227.507L79.7935 273.708L0 227.504Z"
+                fill="#005030"
+              />
+              <path
+                d="M155.605 127.11H156.133V225.887L115.168 249.827V131.718L135.17 162.121C135.17 162.121 139.193 147.037 130.478 135.637C127.049 131.143 123.346 128.609 120.095 127.204C119.897 127.101 119.69 127.007 119.483 126.931L155.605 127.11ZM170.85 65.3326L156.133 90.3754V127.11C156.105 127.063 155.997 126.94 155.997 126.94C154.593 125.433 144.356 115.522 131.1 116.435C126.502 116.746 122.894 117.934 120.095 119.403C119.388 119.771 118.748 120.167 118.154 120.553L142.736 96.2074C142.736 96.2074 129.554 95.435 120.095 103.735C119.276 104.46 118.475 105.252 117.721 106.119C116.665 107.334 115.771 108.54 115.017 109.728C113.924 111.414 113.132 113.043 112.539 114.599C112.398 114.975 111.832 116.69 111.832 116.69L111.804 116.576C110.919 113.43 109.175 109.812 105.953 106.119C101.035 100.466 94.4495 98.0259 89.2676 96.9706C84.5002 95.9999 80.9487 96.2074 80.9487 96.2074L104.69 119.733C101.742 118.018 97.794 116.576 92.6218 116.228C91.3498 116.144 90.1155 116.153 88.9097 116.257C85.8757 116.483 83.0589 117.227 80.5434 118.216C73.2761 121.08 67.5099 126.99 67.4699 127.031H104.447C101.069 128.439 97.127 131.029 93.5014 135.781C90.7766 139.35 89.2791 143.27 88.5132 146.974C88.4345 147.345 88.3669 147.717 88.3103 148.078C88.1079 149.26 87.9726 150.408 87.905 151.512C87.894 151.557 87.894 151.602 87.894 151.647C87.8825 151.884 87.86 152.098 87.86 152.311C87.849 152.525 87.8375 152.751 87.8375 152.953C87.8039 153.708 87.8039 154.418 87.8265 155.104C87.8375 155.678 87.8716 156.23 87.9052 156.76C87.9167 157.03 87.9392 157.299 87.9618 157.548C87.9839 157.806 88.0064 158.054 88.029 158.302V158.313C88.0741 158.786 88.1307 159.225 88.1868 159.631V159.643C88.2093 159.845 88.2434 160.047 88.2655 160.228C88.2995 160.419 88.3331 160.61 88.3672 160.78C88.4569 161.309 88.6147 161.669 88.6713 161.973L67.4684 127.033L67.4666 127.035L45.9569 126.762L45.9758 66.859L52.8254 64.6352V87.6148L62.3414 84.5431V61.564L68.8892 59.4441V82.4329L79.1118 79.145V56.1369L90.3423 52.5003V93.5314C97.898 95.142 104.22 98.6664 108.658 103.764C109.788 105.055 110.787 106.392 111.663 107.749L111.776 52.5003L123.025 56.1089V79.1257L133.239 82.4329L133.248 59.4156L141.492 62.0728V85.1181L151.018 88.2082V65.144L156.133 66.8025V81.5381L164.604 66.8117L101.073 29.7282L37.553 66.7837L42.1318 74.8202V83.7804L6.9601 103.726V187.871L104.154 188.088V146.048L91.1142 166.003L88.6741 161.97L108.412 131.746V253.757L104.154 256.234V188.201L90.3418 195.992V264.318L79.799 270.461V214.911C79.799 209.974 77.7923 205.498 74.5605 202.267C71.3287 199.016 66.8442 197.028 61.9167 197.028C55.3496 197.028 49.612 200.561 46.503 205.819C45.8152 206.996 45.2498 208.24 44.8445 209.569L45.9279 210.652C46.1069 210.379 46.2955 210.125 46.503 209.898C48.2834 207.929 50.8463 206.676 53.7197 206.676C56.3958 206.676 58.817 207.76 60.5601 209.512C62.3216 211.274 63.4055 213.686 63.4055 216.362V260.879L32.832 243.034V214.769C32.7566 205.687 25.5679 197.895 16.5231 197.095C11.7368 196.68 6.2724 198.291 2.824 201.749V101.587L39.7097 80.0773L31.2868 65.3325L101.129 24.6497L117.919 34.4104L156.133 12.1471V56.7118L170.85 65.3326ZM151.516 20.2779L122.338 36.9921L151.516 53.998V20.2779ZM12.2143 207.04C11.3857 206.606 10.4953 206.289 9.5766 206.109C7.3778 205.68 4.7398 205.995 2.8314 207.26L2.8219 225.89L17.4139 234.049V215.615C17.4139 212.619 15.9937 209.746 13.6106 207.929C13.1713 207.594 12.7035 207.296 12.2143 207.04Z"
+                fill="#FFB81C"
+              />
+              <path
+                d="M99.0876 16.5011L98.7569 12.1755L103.189 9.9967L107.012 16.5011H99.0876ZM108.732 16.5011L107.119 12.1541L106.339 10.0288L109.468 12.5173H116.325V11.7803L110.985 11.1502L108.764 6.9635L110.687 7.6578C112.694 8.3733 114.926 7.9569 116.539 6.5791L117.126 6.0665H108.273L107.61 4.8382L101.17 4.8275V2.8196L94.9759 0L89.3898 4.176L89.8705 5.244L93.6299 4.7954L95.0286 8.2345V8.2452H92.7647L88.3751 12.9444L89.2937 13.2542L92.7113 10.2423L95.8832 10.9793L97.6027 16.501H85.0537L82.234 19.5554H99.2798V23.9618H102.997V19.5554H121.078V16.501L108.732 16.5011Z"
+                fill="#005030"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_cpp">
+                <rect width="174.694" height="273.708" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+
+          <!-- Title -->
+          <h1 class="header-title">
+            Cal Poly Pomona<br class="hidden sm:block" />
+            Campus Knowledge Assistant
+          </h1>
         </div>
-        <div class="border-strip"></div>
       </header>
 
+      <!-- Yellow top border strip -->
+      <div class="border-strip"></div>
+
+      <!-- Main Content -->
       <main>
-        <section class="search-section">
+        <!-- Search Bar -->
+        <div class="composer">
           <form id="chatForm" class="search-form">
             <textarea
               id="messageInput"
               class="search-input"
-              rows="2"
-              aria-label="Ask the campus knowledge agent"
-              placeholder="Ask a question about the university website..."
+              rows="1"
+              oninput="this.style.height='0px'; this.style.height=Math.max(45, this.scrollHeight) + 'px'; this.style.overflowY='hidden';"
+              placeholder="Ask Anything."
+              aria-label="Search for campus information"
             ></textarea>
-            <button type="submit" class="search-button">Send</button>
+            <button type="submit" class="search-button" aria-label="Search">
+              <svg class="search-icon" viewBox="0 0 35 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M30.625 28.875L24.2812 22.8937M27.7083 15.125C27.7083 21.2001 22.485 26.125 16.0417 26.125C9.59834 26.125 4.375 21.2001 4.375 15.125C4.375 9.04987 9.59834 4.125 16.0417 4.125C22.485 4.125 27.7083 9.04987 27.7083 15.125Z"
+                  stroke="#1E1E1E"
+                  stroke-width="3.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
           </form>
-          <div id="starterQuestions" class="topics-row chips"></div>
-        </section>
+        </div>
+
+        <!-- Topic Pills -->
+        <div class="topics-container">
+          <div class="topics-row" id="starterQuestions"></div>
+        </div>
+
+        <div class="status-row">
+          <span id="healthStatus">Checking...</span>
+          <strong id="activeModel">Loading model...</strong>
+        </div>
 
         <section id="messages" class="messages"></section>
       </main>
+
+      <!-- Yellow bottom border strip -->
+      <div class="border-strip"></div>
     </div>
 
     <template id="messageTemplate">
@@ -49,6 +106,19 @@
       </article>
     </template>
 
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('messageInput');
+        if (!input) return;
+        const resize = () => {
+          input.style.height = '0px';
+          input.style.height = `${Math.max(45, input.scrollHeight)}px`;
+          input.style.overflowY = 'hidden';
+        };
+        input.addEventListener('input', resize);
+        resize();
+      });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
     <script src="/static/app.js" defer></script>
   </body>
